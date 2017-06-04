@@ -1,1 +1,2 @@
 # myTestLife
+clip :img clip
