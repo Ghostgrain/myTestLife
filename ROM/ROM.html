@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>内存分配</title>
+</head>
+<script type="text/javascript">
+    function start()//程序入口
+    {
+    var ROM = parseInt(document.getElementById("ROM").value);//get ROM value
+        var name = document.getElementById("name").value;
+        if(ROM<40)
+    {
+        alert("ROM数值不足以运行一个进程!");}
+    else if(rename(name))//如果重名则申请失败
+    {
+        alert("进程命名重复!");}
+    else
+    {
+        var tvalue = table_left();
+        var opts = document.getElementById("option");
+        var selected = opts.options[opts.selectedIndex].value;
+        if(selected=="first")
+        {first_fit(tvalue,ROM,name);}//首适应分配,分配内存
+        else if(selected=="circle")
+        {circle(tvalue,ROM,name);}
+        else if(selected=="best")
+        {best(tvalue,ROM,name);}
+        else if(selected=="worst")
+        {worst(tvalue,ROM,name);}
+        else{alert("error")}
+    }
+}
+    function rename(name)//重名检测
+    {
+        var Pname = table_middle();
+        var length = table_middle().length;
+        var i=0
+        for(i;i<length;i++)
+        {
+            if(name==Pname[0][i])
+            return 1;
+        }
+        if(i==length)
+        return 0;
+    }
+    function release()//释放内存
+    {   var i=0;
+        var index = table_middle();
+        var pName = document.getElementById("programName").value;
+        var str = new Array();//保存删除的数据s
+        //进程表删除
+        for(i;i<index[0].length;i++)
+        {
+            if(pName==index[0][i])
+            {    str[0] = parseInt(getEle(i+1,2,"middle"));//进程大小
+                str[1] = parseInt(getEle(i+1,1,"middle"));//进程起始位置
+                deledate("middle",i)
+                showview(table_middle());
+            break;
+            }
+        }
+        if(i==index[0].length)
+        {alert("无此进程!");}
+        else{
+            var ltable = table_left();
+            var length = ltable[0].length;
+            var a=-1,b=-1,k=0;
+            for(var j=0;j<length;j++)
+            {
+                if(parseInt(ltable[0][j])+parseInt(ltable[1][j])==str[1])
+                a = j;
+                //上面接壤一块空内存
+                else if(str[0]+str[1]==ltable[1][j])
+                b = j ;
+                //下面接壤一块空白区
+            }
+     //      alert(str[0]+str[1]);
+            //增加一行数据的
+            if(a==-1&&b==-1)
+            {
+                if(str[1]==0)//在头新增内存
+                addDate_1(str,0);
+                else if(str[0]+str[1]==1024)//在尾新增内存
+                addDate_1(str,length);
+                else
+                for(k;k<length;k++)//中间新增内存
+            {
+                if(ltable[1][k]>str[1])
+                    {addDate_1(str,k);break;}
+            }
+                if(k==length)
+                {addDate_1(str,k)}//如果所有地址都比释放的地址高那么在表尾插入
+
+            }
+            else if(a!=-1&&b!=-1)//删除一行数据的
+            {   var date = new Array;
+                date[0] = parseInt(ltable[0][a])+str[0]+parseInt(ltable[0][b]);//内存拓展
+                date[1] = ltable[1][a];
+                update(date,a);//更新原有数据
+                deledate("left",b);//删除下接内存
+            }
+            else//数据量不变的
+            {
+                if(a!=-1)//上接内存
+                {
+                    var date = new Array;
+                    date[0] = parseInt(ltable[0][a])+parseInt(str[0]);//内存拓展
+                    date[1] = ltable[1][a];
+                    update(date,a);
+                }
+                else
+                {
+                    var date = new Array;
+                    date[0] = parseInt(ltable[0][b])+parseInt(str[0]);
+                    date[1] = str[1];
+                    update(date,b);
+                }
+            }
+        }
+    }
+    function table_left()//获取内存表数值
+    {
+        var table_1 = document.getElementById("left");
+        var tvalue = getvalue(table_1.rows.length,"left");//获取内存表数值
+    return tvalue;
+    }
+    function table_middle()//获取进程表
+    {
+        var table_2 = document.getElementById("middle");
+        var tpvalue = getvalue(table_2.rows.length,"middle");
+        return tpvalue;
+    }
+    function chang_value(tvalue,i,name,ROM)//数值改动
+    {   var str = new Array();
+        var str_1 = new Array();
+        if(tvalue[0][i]-ROM<40)//碎片化处理
+        {
+            str[2] = tvalue[0][i];//全部都给你
+            str_1[0] = 0;
+        }
+        else{str[2] = ROM;
+            str_1[0] = tvalue[0][i]-ROM;}//内存块大小
+        str[0] = name;//记录进程名字
+        str[1] = tvalue[1][i];//记录该时刻内存起始位置
+        addDate(str);
+        showview(table_middle());//视图显示
+        str_1[1] = tvalue[1][i]+ROM;//起始位置往前挪
+        //进行表格更新
+        if(str_1[0]==0)//如果内存为0删除该数据
+        {
+            deledate("left",i);
+        }
+        else
+        {
+            update(str_1,i);//更新数据
+        }
+    }
+    function first_fit(tvalue,ROM,name)//首适应算法
+    {
+        var i =0;
+        for( i;i<tvalue[0].length;i++)
+        {
+            if(tvalue[0][i]>=ROM)//内存分配
+            {   chang_value(tvalue,i,name,ROM);
+                break;
+            }
+        }
+        if(i==tvalue[0].length)
+        {
+            alert("无足够的内存");
+        }
+    }
+    function circle(tvalue,ROM,name)//循环适应
+    {
+        var index = parseInt(document.getElementById("index").innerHTML);
+        var i =0;
+        for(i;i<tvalue[0].length;i++)
+        {   if(index==tvalue[0].length)//所读范围已经溢出表
+            index = 0;//重头读起
+            if(tvalue[0][index]>=ROM)//内存分配
+            {   //记录一次内存添加
+                chang_value(tvalue,index,name,ROM);
+                index += 1;//指向下一个表格
+                document.getElementById("index").innerHTML = index;//把位置写回去
+                break;
+            }
+        }
+        if(i==tvalue[0].length)
+        {
+            alert("无足够的内存");
+        }
+    }
+    function best(tvalue,ROM,name)//最佳
+    {var a= -1,b=1024;//用记录当前位置和数值
+        var i =0;
+        for( i;i<tvalue[0].length;i++)
+        {
+            if(tvalue[0][i]>=ROM)//找到可以分配的资源
+            {   //记录一次内存添加
+                if(b>tvalue[0][i])//如果比之前找到的资源空间小
+                {a=i,b=tvalue[0][i];}//记录该内存的值
+                }}
+        if(a!=-1)
+        {   chang_value(tvalue,a,name,ROM);//进行数据更新
+        }
+        else
+        alert("无足够的内存");
+    }
+    function worst(tvalue,ROM,name)//最坏
+    {   var str = new Array();
+        var str_1 = new Array();
+        var a= -1,b=0;//用记录当前位置和数值
+        var i =0;
+        for( i;i<tvalue[0].length;i++)
+        {
+            if(tvalue[0][i]>=ROM)//找到可以分配的资源
+            {   //记录一次内存添加
+                if(b<tvalue[0][i])//如果比之前找到的资源空间大
+                {a=i,b=tvalue[0][i];}//记录该内存的值
+            }}
+        if(a!=-1)
+        {
+            chang_value(tvalue,a,name,ROM);//进行数据更新
+        }
+        else
+            alert("无足够的内存");
+    }
+    function showview(value)//内存分配视图显示  进程名字
+    {
+    var str = "";
+    for(var i=0;i<value[0].length;i++)
+    {
+        str+="<div style='position: absolute;top:"+value[1][i]/2+"px;width:150px;text-align:center;" +
+                "border-bottom: 2px solid black;" +
+                "overflow=\"hidden\";height:"+(value[2][i]-4)/2+"px;background-color:deepskyblue;'>"
+                +value[0][i]+"</div>";
+    }
+    document.getElementById("right").innerHTML = str;
+}
+    function getvalue(rows,tablename)//获取表值
+    {   var Lvalue = new Array();
+    var Rvalue = new Array();
+    var Mvalue = new Array();
+    var Tvalue = new Array();
+    var index = document.getElementById(tablename).rows.item(0).cells.length;
+    if(index==2)//对剩余内存表进行数值处理
+    {
+        for(var i=1;i<rows;i++)
+    {
+        Lvalue[i-1] = parseInt(getEle(i,0,tablename));//获取内存容量
+        Rvalue[i-1] = parseInt(getEle(i,1,tablename));//获取内存起始位置
+    }
+        Tvalue[0] = Lvalue;
+        Tvalue[1] = Rvalue;
+        return Tvalue;}
+    else//对进程表进行处理
+    {   //alert(tablename);
+        for(var i=1;i<rows;i++){
+            Lvalue[i-1] = getEle(i,0,tablename);//进程名字
+            Rvalue[i-1] = parseInt(getEle(i,1,tablename));//进程起始位置
+            Mvalue[i-1] = parseInt(getEle(i,2,tablename));//进程大小
+        }
+        Tvalue[0] = Lvalue;
+        Tvalue[1] = Rvalue;
+        Tvalue[2] = Mvalue;
+        return Tvalue;
+
+    }
+
+}
+    function getEle(row,Col,tablename)//获取表格中指定位置的值 (行,列)
+    {
+    var value = document.getElementById(tablename).rows[row].cells[Col].innerHTML;//返回一串数字
+    return value;//返回一个数
+}
+    function addDate_1(str,index)//数据更新
+    {
+        var x=document.getElementById("left").insertRow(index+1);
+        var a = x.insertCell(0);
+        var b = x.insertCell(1);
+        a.innerHTML = str[0];
+        b.innerHTML = str[1];
+    }
+    function addDate(value)//增加一行数据
+    {   var index = document.getElementById("middle").rows.length;//记录表的长度
+    var x = document.getElementById("middle").insertRow(index);
+   var a = x.insertCell(0);
+    var b = x.insertCell(1);
+    var c = x.insertCell(2);
+    a.innerHTML = value[0];
+    b.innerHTML = value[1];
+    c.innerHTML = value[2];
+}
+    function deledate(tablename,value)//减少一行数据
+    {
+        document.getElementById(tablename).deleteRow(value+1);
+    }
+    function update(value,index)//更新表
+    {
+        document.getElementById("left").rows[index+1].cells[0].innerHTML = value [0];
+        document.getElementById("left").rows[index+1].cells[1].innerHTML = value [1];
+    }//更新一行数据
+</script>
+<style type="text/css">
+*{margin: 0;padding: 0;font-size: 14px;}
+#wrap {width: 800px;height: 700px;margin: 80px auto;position: relative;border: 1px dotted darkred;padding: 10px;}
+#right {width: 150px;height: 512px;border: 1px solid black;position: absolute;top:10px;right: 10px; }
+#middle{width:300px;margin-left:300px; ;border: 1px solid deepskyblue;}
+#left {width:230px;float: left;border: 1px solid deepskyblue;}
+#bottom{position: absolute;top:620px; }
+table{text-align: center;}
+    td{width: 160px}
+#right_0{position: relative;left: 280px;top: -94px}
+#index{display: none;}
+</style>
+<body>
+<div id="wrap">
+    <table id="left">
+        <tr><td>内存容量</td><td>内存起始位置</td></tr>
+        <tr><td>1024</td><td>0</td></tr>
+    </table>
+    <table id="middle">
+    <tr><td>进程名字</td><td>进程起始位置</td><td>进程大小</td></tr>
+    </table>
+    <div id="right" >
+        </div>
+    <div id="bottom">
+        <div id="left_0"><p>申请内存的大小:</p>
+        <textarea rows="1" cols="20"  id="ROM" placeholder="数值必须不小于40"></textarea>
+        <p>进程的名字:</p>
+        <textarea rows="1" cols="20"  id="name"></textarea>
+        </br>
+        <input type="button" value="申请内存" onclick="start()">
+            <select id="option">
+                <option value="first">首适应</option>
+                <option value="circle">循环首适应</option>
+                <option value="best">最佳适应</option>
+                <option value="worst">最坏适应</option>
+            </select>
+        </div>
+    <div id="right_0">
+        <p>请输入要释放的进程名</p>
+        <input type="text" id="programName">
+        </br>
+        <input type="button" onclick="release()" value="释放">
+        <p id="index" rows="1" cols="1">0</p>
+    </div>
+    </div>
+</div>
+</body>
+</html>
