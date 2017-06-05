@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>menu</title>
+</head>
+<style type="text/css">
+    #wrap_bar{background-color: #999;height: 40px;filter:alpha(opacity=50);opacity:0.5;}
+    *{margin: 0;padding: 0;}
+    #wrap{width: 800px;margin: 0 auto;height: 40px;}
+    li{list-style: none;}
+    a{text-decoration: none;font-family: "微软雅黑";color: #000;}
+    a:active,a:visited{color: #000;}
+    ul li{float: left; position: relative;}
+    ul li a{display: block;padding: 0 10px;height: 40px;line-height: 40px;}
+    ul li a:hover{background-color: #EEE;filter:alpha(opacity=30);opacity: 0.3;}
+    ul li div{display: none;width: 300px;height: 300px;position: absolute;top: 40px;left: 0;background-color: red;}
+</style>
+<script type="text/javascript">
+    window.onload=function()
+    {
+        var my_ul = document.getElementsByTagName("ul")[0];
+        var my_li = my_ul.getElementsByTagName("li");
+        var event = "mouseover";
+   //     my_li[2].addEventListener("click",disp_box(my_li[2]),false)
+        for(var i=0;i<my_li.length;i++)
+        {addEvent(my_li[i],event,function()
+        {var box = this.getElementsByTagName("div")[0];
+            if(box)
+                box.style.display="block";
+        })}
+        event = "mouseout";
+        for(var i=0;i<my_li.length;i++)
+        {addEvent(my_li[i],event,function()
+        {   //var D =this;
+            //this.setTimeout("dis_none()",3000)
+            //settimeout无法传参难解之谜
+            var box = this.getElementsByTagName("div")[0];
+            if(box)
+                box.style.display="none";
+        })}
+    }
+    var addEvent = function(myArr,event,callback)
+    {
+            if(myArr.addEventListener)
+            {myArr.addEventListener(event,callback,false);
+            }else if(el.attachEvent)
+            {
+                myArr.attachEvent('on'+event,callback);
+            }
+        }
+var dis_none= function()
+{   console.log()
+    var box = this.getElementsByTagName("div")[0];
+    if(box)
+        box.style.display="none";
+}
+</script>
+<!--<script type="text/javascript" src="../js/lv16.11.10.js"></script>-->
+<body>
+<div id="wrap_bar">
+<div id="wrap">
+    <ul>
+        <li><a href="#">首页</a></li>
+        <li><a href="#">画友</a></li>
+        <li><a href="#">游戏中心</a><div class="box"></div></li>
+        <li><a href="#">直播</a><div class="box"></div></li>
+        <li><a href="#">周边</a><div class="box"></div></li></ul>
+
+</div>
+</div>
+</body>
+</html>

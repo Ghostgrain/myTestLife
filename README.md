@@ -1,3 +1,3 @@
 # myTestLife
-clip :img clip
+clip :img clip\n
 jq-waterFall:waterFall
