@@ -1,0 +1,32 @@
+#top
+{
+    width: 1000px;
+    height: 300px;
+    margin: 10px auto;
+}
+#mid
+{
+width: 1000px;
+    border: 1px solid #c8c8c8;
+    margin: 10px auto;
+}
+#left
+{   width: 400px;height: 400px;
+    padding: 20px 20px;
+}
+#right
+{   height: 400px;
+    width: 450px;
+    float: right;
+    margin: -420px;
+    margin-right: 85px;
+}
+h1
+{
+    font-weight: bold;
+    font-size: 20px;
+}
+h2
+{
+    font-size: 17px;
+}

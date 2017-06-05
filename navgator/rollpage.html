@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>滚动页面</title>
+</head>
+<style>
+    *{margin: 0;padding: 0;font-size: 14px;}
+    li{list-style: none;}
+    #wrap{margin: 0 auto;width: 870px;padding: 20px;}
+    #wrap .item h2{font-weight: bold;color: deepskyblue;font-size: 20px;
+        border-bottom: 2px solid aqua;margin-bottom: 20px;}
+    #wrap .item{padding: 20px;border: 2px dotted deepskyblue;margin-bottom:30px; }
+    #wrap .item li{display: inline;margin-right: 20px;}
+    #wrap .item li a img{width: 180px;height: 180px;}
+    #menu{position:fixed;top:100px;left: 50%;margin-left: 435px;width: 50px;}
+    #menu a{text-decoration: none;display: block;text-align: center;line-height: 50px;
+        font-size: 16px;font-weight: bold;color: deepskyblue;height: 50px;}
+    #menu ul li a:hover,
+    #menu ul li a.current{background: deepskyblue;color: #FFF;}
+</style>
+<script src="http://libs.baidu.com/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function()
+    {
+        $(window).scroll(function()
+        {   var items = $("#wrap").find(".item");
+            var menu = $("#menu");
+            var top = $(document).scrollTop();
+            var currentId = "";
+            items.each(function()
+            {   var t = $(this);
+                if(top>t.offset().top-300)
+                {
+                    currentId = "#"+ t.attr("id");
+                }
+                else{return false;}
+            })
+            var currentLink = menu.find(".current");
+            if(currentId&&currentLink.attr("href")!=currentId)
+            {
+                currentLink.removeClass("current");
+                menu.find("[href="+currentId+"]").addClass("current");
+            }
+        })
+    })
+
+</script>
+<body>
+<div id="menu">
+    <ul>
+        <li><a href="#item1" class="current">PS</a></li>
+        <li><a href="#item2">JS</a></li>
+        <li><a href="#item3">JQUERY</a></li>
+        <li><a href="#item4">JQUERY</a></li>
+        <li><a href="#item5">JQUERY</a></li>
+    </ul>
+</div>
+    <div id="wrap">
+        <div id="item1" class="item">
+            <h2>PS作品展示</h2>
+            <ul>
+                <li><a href="#"><img src="1F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="1F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="1F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="1F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="1F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="1F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="1F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="1F.jpg" alt=""/></a></li>
+            </ul>
+        </div>
+        <div id="item2" class="item">
+            <h2>JS作品展示</h2>
+            <ul>
+                <li><a href="#"><img src="2F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="2F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="2F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="2F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="2F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="2F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="2F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="2F.jpg" alt=""/></a></li>
+            </ul>
+        </div>
+        <div id="item3" class="item">
+            <h2>JQUERY作品展示</h2>
+            <ul>
+                <li><a href="#"><img src="3F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="3F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="3F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="3F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="3F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="3F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="3F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="3F.jpg" alt=""/></a></li>
+            </ul>
+        </div>
+        <div id="item4" class="item">
+            <h2>JQUERY作品展示</h2>
+            <ul>
+                <li><a href="#"><img src="3F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="3F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="3F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="3F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="3F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="3F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="3F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="3F.jpg" alt=""/></a></li>
+            </ul>
+        </div>
+        <div id="item5" class="item">
+            <h2>JQUERY作品展示</h2>
+            <ul>
+                <li><a href="#"><img src="3F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="3F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="3F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="3F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="3F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="3F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="3F.jpg" alt=""/></a></li>
+                <li><a href="#"><img src="3F.jpg" alt=""/></a></li>
+            </ul>
+        </div>
+    </div>
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+</div>
+</body>
+</html>

@@ -1,0 +1,52 @@
+.container{
+    width: 680px;
+    height: 344px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -340px;
+    margin-top:-280px;
+
+}
+.container img{
+    display: none;
+}
+.list{
+    list-style: none;
+    position: absolute;
+    right: 30px;
+    bottom: 10px;
+}
+.list li{
+    float: left;
+    display: inline-block;
+    height: 20px;
+    width: 20px;
+    background-color: #000;
+    color: #fff;
+    margin-left: 10px;
+    text-align: center;
+}
+.arrows{
+    width: 100%;
+    position: absolute;
+    top: 50%;
+    margin-top: -20px;
+}
+.arrows span{
+    height: 20px;
+    width: 20px;
+    background-color: #000;
+    color: #fff ;
+    text-align: center;
+    line-height: 20px;
+}
+.content img.selected{
+    display: block ;
+}
+.prev{
+    float: left;
+}
+.next{
+    float: right;
+}

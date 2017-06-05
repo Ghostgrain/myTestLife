@@ -1,0 +1,68 @@
+table td{
+    margin-right: 25px;
+}
+#top
+{
+    width: 1000px;
+    height: 60px;
+    border-bottom: 2px solid #e5e5e5;
+    margin: 0px auto;
+}
+#middle
+{
+    width: 1000px;
+    height: 300px;
+    margin: 0px auto;
+}
+#foot
+{
+    width: 1000px;
+    height: 500px;
+    margin: 0px auto;
+}
+
+#menu {
+    font-size: 14px;
+    width: 340px;
+    overflow: hidden;
+}
+
+#menu, #menu ul {
+    list-style-type: none;
+    background: #A3C159;
+    margin: 0;
+    padding: 0;
+}
+
+#menu li {
+    float: left;
+}
+
+#menu li a {
+    display: block;
+    padding: 10px 15px;
+    color: #FFF;
+    text-decoration: none;
+    text-align: center;
+    border-right: 1px solid #FFF;
+}
+#menu li a:hover {
+    background: #1BA6B2;
+}
+
+#menu li ul li {
+    float: none;
+}
+
+#menu li ul li a {
+    border-top: 1px solid #FFF;
+}
+
+#menu li ul {
+    display: none;
+    position: absolute;
+}
+
+#menu li:hover ul {
+    display: block;
+}

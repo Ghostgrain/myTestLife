@@ -1,0 +1,5 @@
+*{margin: 0;padding:0}
+#wrap{position: relative;margin: 0 auto;width: 850px}
+.box{padding: 15px;border-radius:5px;border: 1px solid gainsboro;}
+.im{width: 160px;height: auto;}
+.wbox{padding-bottom: 15px;margin-right:10px;float: left; }

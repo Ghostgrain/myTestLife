@@ -1,0 +1,66 @@
+ <!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>金福花店用户注册</title>
+    <style type="text/css">
+    div{
+        border: 1px solid grey;
+        width: 900px;
+        margin: 100px auto;
+        padding-left: 40px;
+    }
+    </style>
+    <script>
+        function check()
+        {
+            with(document.all){
+                if(pwd1.value!=pwd2.value)
+                {
+                    alert("两次输入的密码不唯一")
+                    pwd1.value = "";
+                    pwd2.value = "";
+                }
+                else document.forms[0].submit();
+            }
+        }
+    </script>
+    <link rel="shortcut icon" href="images/logo.ico"/>
+    <link rel="bookmark" href="images/logo.ico"/>
+</head>
+<body>
+<div>
+    <form action="#" method="get">
+        <p><font size="16" color="#808080">金福花店用户注册</font></p><br/>
+        用户登录名:&nbsp;&nbsp;&nbsp;<input type="text" pattern="(\w)+" placeholder="由数字字母和下划线组成"required name="zhanghao"><br/>
+        用户登录密码:&nbsp;&nbsp;<input type="password" id="pwd1"required name="pwd"><br/>
+        再次输入登录密码:<input type="password" id="pwd2"required><br/>
+        <input type="button" value="验证" onclick="check()"><br/>
+        性别<span lang=EN-US>:<INPUT TYPE="radio" NAME="sex" VALUE="radio" >
+  <label/>
+   </span>女<span lang=EN-US><INPUT TYPE="radio" NAME="sex" VALUE="radio"
+                                   id=radio></span>男<span lang=EN-US><br/>
+   </span>
+        <p>最爱的花<span lang=EN-US>: <INPUT TYPE="checkbox" NAME="checkbox"
+                                          id=checkbox>
+  <label>
+    <st1:PersonName ProductID="潘" w:st="on">
+            玫瑰
+            <label>
+                <span lang=EN-US><INPUT TYPE="checkbox" NAME="checkbox3" ></span>
+            </label>
+            血色玫瑰
+            <label>
+                <span lang=EN-US><INPUT TYPE="checkbox" NAME="checkbox3" ></span>
+            </label>
+            蓝色妖姬<br/>
+        电子邮箱:&nbsp;&nbsp;&nbsp;&nbsp;<input type="email" placeholder="cdluban@gmail"  pattern="^((\w)+@(\w)+((\.\w+))+"required name="email">(必须填写)<br/>
+        兴趣爱好:&nbsp;&nbsp;&nbsp;&nbsp;<input type="text" name="interest"><br/>
+        <p>您的上传<span lang=EN-US>:</span></p>
+        <input type=file name=fileup size=20 maxlength=500>
+        <p class=MsoNormal><span lang=EN-US><br>
+        <input type="reset"><input type="submit">
+    </form>
+</div>
+</body>
+</html>

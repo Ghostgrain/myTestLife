@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>bing</title>
+</head>
+<link rel="stylesheet" href="searchCSS.css" type="text/css"/>
+<script type="text/javascript" src="lvlibrary.js"></script>
+<script type="text/javascript">
+    window.onload=function()
+    {   var e=getDom('search-suggest');
+        addEvent('search-text','keyup',function()
+        {
+            var searchText = getDom('search-text').value;
+            var html = "";
+            ajaxGet('http://api.bing.com/qsonhs.aspx?q='+searchText,function()
+            {
+                var d = d.AS.Results[0].Suggests;
+                 for(var i=0;i< d.length;i++)
+                {
+                    html+='<li>'+d[i].Txt+'</li>';
+                }
+                console.log(html);
+            })
+            e.innerHTML = html;
+            e.style.display='block';
+
+        })
+    }
+</script>
+<body>
+<div id="wrap">
+    <div id="form-wrap">
+        <img src="images/logo.png" alt="" id="logo"/>
+        <form class="search-form"action="https://cn.bing.com/search" target="_blank" method="post">
+            <input type="text" id="search-text"/>
+            <input type="submit" id="bt" value=""/>
+        </form>
+    </div>
+    <div class="suggest" id="search-suggest">
+
+    </div>
+</div>
+</body>
+</html>

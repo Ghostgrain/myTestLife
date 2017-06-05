@@ -1,0 +1,23 @@
+#top
+{
+    width: 1000px;
+    height: 300px;
+    margin: 10px auto;
+}
+#mid
+{   width: 1059px;
+    margin: 50px auto;
+    border: 1px solid grey;
+    /*height: 820px;*/
+}
+
+tr div
+{
+    width: 250px;
+    height: 300px;
+    padding: 5px;
+}
+tr div:hover
+{   padding: 4px;
+    border: 1px solid red;
+}

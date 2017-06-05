@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Bank</title>
+</head>
+<style type="text/css">
+    *{margin:0; padding: 0;font-size: 18px;}
+    table{border:1px solid deepskyblue;  margin: 30px auto;background-image: url("1.png");}
+    td{ margin:5px 20px;width: 100px;height:30px;text-align: center}
+    div{margin: 10px auto;border: 1px solid deepskyblue;width: 600px;height: 230px}
+    input{margin:7px 146px;width: 300px;height: 30px;}
+    p{
+        margin: 2px 142px;}
+</style>
+<script type="text/javascript">
+   function now()//检测当前系统是否安全
+   {    var left = getEle(1,4);
+        var Need = new Array(5);
+       var finish  = 1;
+       for(var i=1;i<6;i++)
+       {
+           Need[i-1]= getEle(i,3);
+       }
+       var str=securityfind(left);
+    for(var i=1;i<6;i++)
+    {   for(var k=0;k<4;k++)
+    {
+        if(Need[i-1][k]!=0)
+        finish;
+    }
+        putEle(i,3,Need[i-1]);
+    }
+   if(!finish)
+   alert("当前系统不安全");
+       else
+       alert("安全系列为："+str);
+
+   }
+    function ask()//函数入口
+{
+    var Want =  document.getElementById("Ineed").value;//需要操作的资源数
+    var pro = parseInt(document.getElementById("Who").value);//操作对象
+    var Myvalue = turn(Want);
+    security(pro,Myvalue);
+}
+function turn(Ele)//进行字符数组的数字变化
+{
+    var String = Ele.split(",");
+    var Myvalue = new Array(4);
+    for(var i=0;i<4;i++)
+    {
+        Myvalue[i]= parseInt(String[i]);//获取分配的资源
+    }
+    return Myvalue;
+}
+function getEle(row,Col)//获取表格中指定位置的值
+{
+    var value = document.getElementById("MyTable").rows[row].cells[Col].innerHTML;//返回一串数字
+    return turn(value);//返回一个数组
+}
+function putEle(row,Col,value)//在指定位置放指定值
+{   var str = "";
+    for(var i=0;i<4;i++)
+    {   if(i<3)
+        str+=value[i]+",";
+        else
+        str+=value[i];
+    }
+    document.getElementById("MyTable").rows[row].cells[Col].innerHTML = str;
+}
+function securityfind(left)//安全检测
+{   var j= 1,z=0;
+    var need = [0,0,0,0];
+    var str ="";
+    for(var i = 0;i<5;i++)
+    {
+        for(j=1;j<6;j++)
+        {
+            var finish = 0;//默认不可以分配
+            var a=getEle(j,3);//a为数组//getEle里面获取了一串数字
+               for(var k = 0;k<4;k++)//如果所有需求不为0
+                if(a[k]!=0)finish = 1;//则可进行分配
+         if(finish)//如果可分配
+         {for(var k=0;k<4;k++)//进行Need和Availble的比对
+         if(left[k]<a[k])//如果有一资源不足以分配则  可finish为0
+             finish = 0;//不能满足
+             if(finish)//满足分配条件分配则进行分配
+             {  var b=getEle(j,2);//将已有资源释放
+                 for(var k =0;k<4;k++)
+                 {
+                     left[k]+=b[k];//资源增加
+                     putEle(j,3,need);
+                 }
+                 str+="p"+j+",";
+             }}}}
+    return str;
+}
+function security(pro,Want)
+{
+    var Need = getEle(pro+1,3);//所需资源数组
+    var Availble = getEle(1,4);//所剩资源数组
+    var Allocation = getEle(pro+1,2);//所拥有资源数组
+    //检测是否大于所剩资源数
+    var pass = 1;//默认通过允许申请
+    for(var i=0;i<4;i++)
+    if(Want[i]>Availble[i]||Want[i]>Need[i])//如果请求资源大于需要资源或者所剩资源申请失败
+    pass=0;
+    if(!pass){alert("申请出错!");}
+    if(pass){//保留现场
+        var a = new Array(5);//保存所需资源字符串数组
+        var b = new Array(5);//保存所有资源字符串数组
+        var Ik = Availble;//所剩资源
+        for(i=1;i<6;i++)
+        {
+            a[i-1] = getEle(i,3);//
+            b[i-1] = getEle(i,2);
+        }
+        var alfinsh = 1;//默认申请完成任务
+        for(var i=0;i<4;i++)
+        if(Need[i]-Want[i]!=0)//只要有资源还有需求
+        alfinsh = 0;//没完成任务
+        if(alfinsh)//是否已经完成任务了
+        {//完成任务
+            for(var i=0;i<4;i++) {
+                Availble[i] += Allocation[i];//剩余资源加加
+                Allocation[i] +=Want[i];
+                Need[i]=0;
+            }
+                putEle(pro+1,3,Need);//Need为0
+            putEle(1,4,Availble);//重写剩余资源
+            putEle(pro+1,2,Allocation);//重写已有资源
+            now();
+        }else{var left = new Array(4);//保存所剩资源
+            var Ineed = new Array(4);//保存所需资源
+            var IAll = new Array(4);//保存已有资源
+            var Ileft = new Array(4);//保存所剩资源
+            for(var i=0;i<4;i++)
+            {   left[i] = Availble[i]-Want[i];//进行资源记录,预备重写
+                Ileft[i] = Availble[i]-Want[i];
+                Ineed[i] = Need[i]-Want[i];
+                IAll[i] = Allocation[i]+Want[i];
+            }
+            //假设申请成功
+            //重写数据
+            putEle(pro+1,3,Ineed);//所需资源--
+            putEle(pro+1,2,IAll);
+            putEle(1,4,left);
+            var str=securityfind(left);//进行安全检测 获取安全
+            //进行判断是否所有资源都完成
+            var finish = 1;
+            for(var i=1;i<6;i++)
+            {   for(var k=0;k<4;k++)
+                if(getEle(i,3)[k]!=0)//只要有一项没完成那么
+                    finish = 0;//
+            }
+            //进行现场恢复
+            putEle(1,4,Ik);
+            for(var i =1;i<6;i++)
+            {
+                putEle(i,3,a[i-1]);
+                putEle(i,2,b[i-1]);
+            }
+            if(finish)//成功申请
+            {   alert("安全序列为："+str);
+                putEle(pro+1,2,IAll);//进行成功分配
+                putEle(pro+1,3,Ineed);//所需--;
+                putEle(1,4,Ileft);//还剩资源
+            }
+            else
+            {alert("申请将造成死锁,不给你分配!");}
+        }}
+
+}
+</script>
+<body>
+<table id="MyTable" >
+    <tr><td>资源/进程</td><td>Max</td><td>Allocation</td><td>Need</td><td>Availble</td></tr>
+    <tr id="0"><td>p0</td><td>0,0,4,4</td><td>0,0,3,2</td><td>0,0,1,2</td><td>1,6,2,2</td></tr>
+    <tr id="1"><td>p1</td><td>2,7,5,0</td><td>1,0,0,0</td><td>1,7,5,0</td><td>&nbsp</td></tr>
+    <tr id="2"><td>p2</td><td>3,6,9,9</td><td>1,3,4,3</td><td>2,3,5,6</td><td>&nbsp</td></tr>
+    <tr id="3"><td>p3</td><td>0,9,8,4</td><td>0,3,3,2</td><td>0,6,5,2</td><td>&nbsp</td></tr>
+    <tr id="4"><td>p4</td><td>0,6,6,9</td><td>0,0,1,4</td><td>0,6,5,5</td><td>&nbsp</td></tr>
+</table>
+<div>
+    <p>要申请的操作的进程号</p><input id="Who" type="text" placeholder="请输入请求的进程的角表0,1,2,3,4">
+    <br/>
+    <p>想要分配的资源</p>
+    <input id="Ineed" placeholder="分发的资源数 格式(a,b,c,d)">
+    <br/>
+    <input type="button" value="发送请求" onclick="ask()">
+    <input type="button" value="当前系统是否安全" onclick="now()">
+</div>
+</body>
+</html>
