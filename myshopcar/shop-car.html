@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>shop_car</title>
+    <link rel="stylesheet" href="css/style.css"/>
+    <script type="text/javascript">
+        window.onload = function()
+        {
+            var myTable = document.getElementById("cartTable");
+            var myTr = myTable.children[1].rows;
+            var checkInputs = document.getElementsByClassName("check");
+            var checkAllInputs = document.getElementsByClassName("check-all");
+            var selected = document.getElementById('selected');
+            var selectedTotal = document.getElementById('selectedTotal');
+            var selectedViewList = document.getElementById('selectedViewList');
+            var foot = document.getElementById('foot');
+            var deleteAll = document.getElementById('deleteAll');
+            for(var i=0;i<checkInputs.length;i++)//对按钮进行事件绑定
+            {
+                addEvent(checkInputs[i],"click",function()
+                {
+                    if(this.className == "check-all check")
+                    {
+                        for(var k=0;k<checkInputs.length;k++)
+                        {checkInputs[k].checked = this.checked;}
+                    }
+                    else if(this.checked == false){
+                        for(var j=0;j<checkAllInputs.length;j++)
+                        {
+                            checkAllInputs[j].checked = this.checked;
+                        }
+                    }
+                    getTotal(myTr);})
+            }
+            selected.onclick = function () {
+                if (foot.className == 'foot') {
+                    if (selectedTotal.innerHTML != 0) {
+                        foot.className = 'foot show';
+                    }
+                }
+                else {
+                    foot.className = 'foot';
+                }
+            }
+            selectedViewList.onclick = function (e) {
+                e = e || window.event;
+                var el = e.srcElement|| e.target;
+                if (el.className == 'del') {
+                    var index = el.getAttribute('index');
+                    var input = myTr[index].getElementsByTagName('input')[0];
+                    input.checked = false;
+                    input.onclick();
+                }
+            }
+            for(var i = 0;i < myTr.length;i++)
+            {
+                addEvent(myTr[i],'click',function(e)
+                {
+                    e = e|| window.event;
+                    var ele = e.srcElement|| e.target;//获取点击对象
+                    var cls = ele.className;
+                    var input = this.getElementsByTagName('input')[1];
+                    var val = parseInt(input.value);
+                    var reduce = this.getElementsByTagName('span')[1];
+                    switch (cls)
+                    {
+                        case 'add':
+                            input.value = val + 1;
+                            reduce.innerHTML = '-';
+                            getSubTotal(this);
+                            break;
+                        case 'reduce':
+                            if(val>1)
+                            {input.value = val -1;}
+                            if(input.value <= 1)
+                            {reduce.innerHTML = '';}
+                            getSubTotal(this);
+                            break;
+                        case 'delete':
+                            var conf = confirm('确认要删除吗?');
+                            if(conf)
+                            {this.parentNode.removeChild(this);}
+                            break;
+                    }
+                    getTotal(myTr);
+                })
+            addEvent(myTr[i].getElementsByTagName('input')[1],'keyup',function()
+            {   var val = parseInt(this.value);
+                var tr = this.parentNode.parentNode;
+                var reduce = tr.getElementsByTagName('span')[1];
+                if(isNaN(val) || val < 1)
+                {val = 1;}
+                this.value = val;
+                if( val <= 1)
+                { reduce.innerHTML = '';}
+                else{reduce.innerHTML = '-';}
+                getSubTotal(tr);
+                getTotal(myTr);
+            })
+            }
+            checkAllInputs[0].checked = true;
+            checkAllInputs[0].onclick();
+        }
+        function getTotal(myTr)//计算数值
+        {   var sum = 0;//计算购物总额
+            var selected = 0;//计算总数量
+            var str = '';
+            var selectedViewList = document.getElementById('selectedViewList');
+            var foot = document.getElementById('foot');
+            for(var i=0;i<myTr.length;i++)
+            {
+               var mycheck = myTr[i].getElementsByTagName("input")[0].checked;
+                if(mycheck)
+                {   var goodsNum = parseInt(myTr[i].getElementsByClassName("count-input")[0].value);
+                    var subtotal = parseFloat(myTr[i].getElementsByClassName("subtotal")[0].innerHTML);
+                    myTr[i].className = 'on';
+                    sum += subtotal;
+                    selected += goodsNum;
+                    str +='<div><img src="' + myTr[i].getElementsByTagName('img')[0].src + '">' +
+                            '<span class="del" index="' + i + '">取消选择</span></div>'}
+                else {myTr[i].className = '';}
+            }
+                var selectedTotal = document.getElementById("selectedTotal");
+                selectedTotal.innerHTML = selected;
+                var priceTotal = document.getElementById("priceTotal");
+                priceTotal.innerHTML = sum.toFixed(2);//保留两位小数
+                 selectedViewList.innerHTML = str;
+            if(selected == 0)
+            {            foot.className = 'foot';
+            }
+        }
+        function addEvent(ele,event,callback)//事件绑定兼容函数
+        {
+            if(ele.addEventListener)
+            {ele.addEventListener(event,callback,false);
+            }else if(el.attachEvent)
+            {
+                ele.attachEvent('on'+event,callback);
+            }
+        }
+        function getSubTotal(tr)//计算小计值
+        {
+            var goodsNum = tr.getElementsByClassName('count-input')[0].value;
+            var price = tr.getElementsByClassName('price')[0].innerHTML;
+            var sum = parseFloat(goodsNum * price).toFixed(2);
+            tr.getElementsByClassName('subtotal')[0].innerHTML = sum;
+        }
+
+    </script>
+</head>
+<body>
+<table id="cartTable">
+    <thead>
+    <tr>
+        <th><label><input class="check-all check" type="checkbox" />&nbsp;全选</label></th>
+        <th>商品</th>
+        <th>单价</th>
+        <th>数量</th>
+        <th>小计</th>
+        <th>操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td class="checkbox"><input class="check-one check" type="checkbox"/></td>
+        <td class="goods"><img src="images/1.jpg" alt=""/><span>Casio/卡西欧 EX-TR350</span></td>
+        <td class="price">5999.88</td>
+        <td class="count"><span class="reduce"></span><input class="count-input" type="text" value="1"/><span class="add">+</span></td>
+        <td class="subtotal">5999.88</td>
+        <td class="operation"><span class="delete">删除</span></td>
+    </tr>
+    <tr>
+        <td class="checkbox"><input class="check-one check" type="checkbox"/></td>
+        <td class="goods"><img src="images/2.jpg" alt=""/><span>Canon/佳能 PowerShot SX50 HS</span></td>
+        <td class="price">3888.50</td>
+        <td class="count"><span class="reduce"></span><input class="count-input" type="text" value="1"/><span class="add">+</span></td>
+        <td class="subtotal">3888.50</td>
+        <td class="operation"><span class="delete">删除</span></td>
+    </tr>
+    <tr>
+        <td class="checkbox"><input class="check-one check" type="checkbox"/></td>
+        <td class="goods"><img src="images/3.jpg" alt=""/><span>Sony/索尼 DSC-WX300</span></td>
+        <td class="price">1428.50</td>
+        <td class="count"><span class="reduce"></span><input class="count-input" type="text" value="1"/><span class="add">+</span></td>
+        <td class="subtotal">1428.50</td>
+        <td class="operation"><span class="delete">删除</span></td>
+    </tr>
+    <tr>
+        <td class="checkbox"><input class="check-one check" type="checkbox"/></td>
+        <td class="goods"><img src="images/4.jpg" alt=""/><span>Fujifilm/富士 instax mini 25</span></td>
+        <td class="price">640.60</td>
+        <td class="count"><span class="reduce"></span><input class="count-input" type="text" value="1"/><span class="add">+</span></td>
+        <td class="subtotal">640.60</td>
+        <td class="operation"><span class="delete">删除</span></td>
+    </tr>
+    </tbody>
+</table>
+<div class="foot" id="foot">
+    <label class="fl select-all"><input type="checkbox" class="check-all check"/>&nbsp;全选</label>
+    <a class="fl delete" id="deleteAll" href="javascript:;">删除</a>
+    <div class="fr closing">结 算</div>
+    <div class="fr total">合计：￥<span id="priceTotal">0.00</span></div>
+    <div class="fr selected" id="selected">已选商品<span id="selectedTotal">0</span>件<span class="arrow up">︽</span><span class="arrow down">︾</span></div>
+    <div class="selected-view">
+        <div id="selectedViewList" class="clearfix">
+            <div><img src="images/1.jpg"><span>取消选择</span></div>
+        </div>
+        <span class="arrow">◆<span>◆</span></span>
+    </div>
+</div>
+</body>
+</html>
