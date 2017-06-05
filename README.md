@@ -1,4 +1,4 @@
 # myTestLife
-clip :img clip\n
+clip :img clip
 jq-waterFall:waterFall
-ROM:操作系统内存分配模拟
+ROM:homework
