@@ -41,7 +41,17 @@
             position: relative;
             overflow: hidden;
         }
-
+        .RangeInput{
+            width: 220px;
+            height: 12px;
+            position: absolute;
+            top:70%;
+            left: 50%;
+            margin-left: -110px;
+            vertical-align: middle;
+            background: transparent;
+            -webkit-appearance: none;
+        }
     </style>
 </head>
 <body>
@@ -71,24 +81,18 @@
                     var boundary;
                     /*确定图片是横放还是竖放,*/
                     if(flag >1 ){
-                        oImg.style.cssText += "height: 160px;top: 50%;margin-top: -80px;";
-                        oImg.style.cssText += "left: 50%;margin-left: -"+oImg.offsetWidth/2+"px;";
-                        preMask.style.borderRight = "48px solid rgba(255, 255, 255, .8)";
-                        preMask.style.borderLeft = "48px solid rgba(255, 255, 255, .8)";
-                        preMask.style.cssText += "margin-top: -80px;margin-left: -128px";
+                        oImg.style.cssText += "height: 160px;top: 50%;margin-top: -80px;left: 48px";
+//                        oImg.style.cssText += "left: 50%;margin-left: -"+oImg.offsetWidth/2+"px;"
                         boundary = {left: 190,right: (350 - oImg.offsetWidth),top: 128, bottom: (288 -oImg.offsetHeight)};
 
                     }else if(flag == 1)
                     {
                         oImg.style.cssText += "height: 160px;top: 50%;margin-top: -80px;left: 50%;margin-left: -80px";
-                        container.removeChild(preMask);
+
                     }
                     else{
                         oImg.style.cssText += "width: 160px;left: 50%;margin-left: -80px;";
                         oImg.style.cssText += "top: 50%;margin-top: -"+oImg.offsetHeight/2+"px;";
-                        preMask.style.borderTop = "48px solid rgba(255, 255, 255, .8)";
-                        preMask.style.borderBottom = "48px solid rgba(255, 255, 255, .8)";
-                        preMask.style.cssText += "margin-left: -80px;margin-top: -128px";
                         boundary = {left: 128,right: (288 - oImg.offsetWidth),top: 156, bottom: (316 -oImg.offsetHeight)};
                     }
                     if(boundary !== undefined)
@@ -244,9 +248,31 @@
         /*聚焦框*/
         var preMask = document.createElement("div");
         preMask.style.cssText = "width: 160px;height: 160px;background: transparent;position: absolute;" +
-                "left: 50%;top: 50%;";
+                "left: 0;top: 0;";
         preMask.style.zIndex = 2;
+        preMask.style.border = "48px solid rgba(255, 255, 255, .8)";
 
+        /*放大滑块*/
+        var slider = document.createElement('input');
+        slider.type = "range";
+        slider.step = "0.01";
+        slider.min = "1";
+        slider.max = "2";
+        slider.className = "RangeInput";
+        slider.value = "1";
+        addEvent(slider, "change", function(){
+            var oImg = slider.parentNode.childNodes[1].childNodes[1];
+            if(oImg.style.width){
+                oImg.style.width = slider.value * 160 + "px";
+
+            }else{
+                oImg.style.height = slider.value * 160 + "px";
+            }
+            oImg.style.left = "50%";
+            oImg.style.top = "50%";
+            oImg.style.marginTop = -oImg.offsetHeight/2 + "px";
+            oImg.style.marginLeft = -oImg.offsetWidth/2 + "px";
+        });
 
         /*进行模块的拼接*/
         document.body.appendChild(mask);
@@ -256,6 +282,7 @@
         setAvatar.appendChild(avatarContainer);
         setAvatar.appendChild(closeAll);
         setAvatar.appendChild(oInput);
+        setAvatar.appendChild(slider);
         preview(target,preMask);
     }
 </script>
