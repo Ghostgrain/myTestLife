@@ -5,20 +5,19 @@
     <title>upload_avatar</title>
 </head>
 <style>
-    #content{
-        width: 100px;
-        margin-top: 30px;
-        left: 50%;
-        margin-left: -50px;
-        position: absolute;
-    }
+
 </style>
 <body>
 <div id="content">
-    <form action="#" method="post">
-        <input type="file" name="img"/>
-        <input type="submit" name="sub" value="上传"/>
-    </form>
+
 </div>
+<script>
+    window.onload = function(){
+        var oDate = new Date();
+
+        console.log(parseInt((oDate.getTime()/1000 % (24 * 60 * 60)) )  );
+    }//1440
+    //571
+</script>
 </body>
 </html>

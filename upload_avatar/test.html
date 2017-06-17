@@ -38,8 +38,8 @@
             height: 256px;
             margin: 0 auto 30px;
             cursor: move;
-            background: black;
             position: relative;
+            overflow: hidden;
         }
 
     </style>
@@ -52,15 +52,52 @@
 </form>
 
 <script type="text/javascript">
-    function preview(file)
+    /*图片预览函数*/
+    function preview(file, preMask)
     {
         var prevDiv = document.getElementById('UserAvatarEditor-container');
         if (file.files && file.files[0])
         {
             var reader = new FileReader();
+
             reader.onload = function(evt){
-                prevDiv.innerHTML = '<img src="' + evt.target.result + '" style="width:256px"/>';
-            console.log(111);
+                var oImg = new Image();
+                oImg.src = evt.target.result;
+                oImg.style.cssText = "position:absolute;"
+                oImg.onload = function(){
+                    var flag = oImg.offsetWidth/oImg.offsetHeight;
+//                    console.log(flag);
+                    var container = preMask.parentNode;
+                    var boundary;
+                    /*确定图片是横放还是竖放,*/
+                    if(flag >1 ){
+                        oImg.style.cssText += "height: 160px;top: 50%;margin-top: -80px;";
+                        oImg.style.cssText += "left: 50%;margin-left: -"+oImg.offsetWidth/2+"px;";
+                        preMask.style.borderRight = "48px solid rgba(255, 255, 255, .8)";
+                        preMask.style.borderLeft = "48px solid rgba(255, 255, 255, .8)";
+                        preMask.style.cssText += "margin-top: -80px;margin-left: -128px";
+                        boundary = {left: 190,right: (350 - oImg.offsetWidth),top: 128, bottom: (288 -oImg.offsetHeight)};
+
+                    }else if(flag == 1)
+                    {
+                        oImg.style.cssText += "height: 160px;top: 50%;margin-top: -80px;left: 50%;margin-left: -80px";
+                        container.removeChild(preMask);
+                    }
+                    else{
+                        oImg.style.cssText += "width: 160px;left: 50%;margin-left: -80px;";
+                        oImg.style.cssText += "top: 50%;margin-top: -"+oImg.offsetHeight/2+"px;";
+                        preMask.style.borderTop = "48px solid rgba(255, 255, 255, .8)";
+                        preMask.style.borderBottom = "48px solid rgba(255, 255, 255, .8)";
+                        preMask.style.cssText += "margin-left: -80px;margin-top: -128px";
+                        boundary = {left: 128,right: (288 - oImg.offsetWidth),top: 156, bottom: (316 -oImg.offsetHeight)};
+                    }
+                    if(boundary !== undefined)
+                    drag(container, oImg, boundary);
+                };
+
+//                console.log(oImg.offsetWidth);
+//                prevDiv.innerHTML = '<img src="' + evt.target.result + '" style="width:256px"/>';
+                prevDiv.appendChild(oImg);
             }
             reader.readAsDataURL(file.files[0]);
         }
@@ -70,6 +107,7 @@
           prevDiv.innerHTML = '<div class="img" style="filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(sizingMethod=scale,src=\'' + file.value + '\'"></div>';
         }
     }
+    /*文件大小检测*/
     function fileChange(target){
     /*检测上传文件的类型*/
         var btn = document.getElementById('submit_upload');
@@ -108,7 +146,6 @@
             fileSize = file.Size;
         } else {
             fileSize = target.files[0].size;
-            console.log(fileSize);
         }
 
         var size = fileSize ;
@@ -117,28 +154,109 @@
             alert("文件大小不能超过3M");
         }else{
             /*所有验证都通过了,开始弹层*/
-            var mask = document.createElement('div');
-            mask.id = "mask";
-            /*弹层内容模块*/
-            var setAvatar = document.createElement('div');
-            setAvatar.id = "setAvatar";
-            var h3 = document.createElement('h3');
-            h3.className = "Modal-title";
-            h3.innerHTML = "编辑头像";
-            /*content区*/
-            var avatarContainer = document.createElement('div');
-            avatarContainer.id = "UserAvatarEditor-container";
-            var closeAll = document.createElement('span');
-            closeAll.style.cssText = "width:16px;height:16px;line-height:16px;" +
-                    ";position:absolute;right:-56px;top:0;padding:14px;background:url(close.png) ";
-            document.body.appendChild(mask);
-            document.body.appendChild(setAvatar);
-            setAvatar.appendChild(h3);
-            setAvatar.appendChild(avatarContainer);
-            setAvatar.appendChild(closeAll);
-            preview(target);
+            doMask(target);
             btn.disabled=false;
         }
+    }
+    function addEvent(ele, event, callback)//监听事件
+    {
+        if(ele.addEventListener)
+        {ele.addEventListener(event,callback,false);
+        }else if(el.attachEvent)
+        {
+            ele.attachEvent('on'+event,callback);
+        }
+    }
+    /*元素拖拽函数*/
+    function drag(elem, avatar, boundary)
+    {   /*boundary:top, right, bottom, left*/
+        elem.onmousedown = function(e){
+            e = e || window.event;
+            var disX = e.clientX - this.offsetLeft;
+            var disY = e.clientY - this.offsetTop;
+            document.onmousemove = function(e){
+                e = e || window.event;
+
+                avatar.left = e.clientX - disX;
+                avatar.top = e.clientY - disY;
+                if(avatar.left > boundary.left)
+                {
+                    avatar.left = boundary.left;
+                }else if(avatar.left < boundary.right){
+                    avatar.left = boundary.right;
+                }
+                if(avatar.top > boundary.top)
+                {
+                    avatar.top = boundary.top;
+                }else if(avatar.top < boundary.bottom){
+                    avatar.top = boundary.bottom;
+                }
+                avatar.style.left = avatar.left+"px";
+                avatar.style.top = avatar.top + "px";
+//                console.log(elem);
+                return false;
+            };
+
+            elem.onmouseup = function(){
+                document.onmousemove = null;//取消事件
+            };
+        };
+    }
+    /*图片检测弹层*/
+    function doMask(target){
+        var mask = document.createElement('div');
+        mask.id = "mask";
+
+
+        /*弹层内容模块*/
+        var setAvatar = document.createElement('div');
+        setAvatar.id = "setAvatar";
+        var h3 = document.createElement('h3');
+        h3.className = "Modal-title";
+        h3.innerHTML = "编辑头像";
+
+        /*content区*/
+        var avatarContainer = document.createElement('div');
+        avatarContainer.id = "UserAvatarEditor-container";
+
+        /*关闭小按钮*/
+        var closeAll = document.createElement('span');
+        closeAll.style.cssText = "width:16px;height:16px;line-height:16px;" +
+                ";position:absolute;right:-56px;top:0;padding:14px;background:url(close.png);cursor: pointer ";
+        addEvent(closeAll, "click", function(){
+            document.body.removeChild(mask);
+            document.body.removeChild(setAvatar);
+        });
+
+        /*保存按钮*/
+        var oInput = document.createElement('input');
+        oInput.type = "button";
+        oInput.value = "保存";
+        oInput.style.cssText = "display: block;width: 220px;background: #0f88eb;border: 1px solid #0f88eb;" +
+                "height: 32px;border-radius: 3px;margin: 108px auto;color: white;font-weight: bold";
+        addEvent(oInput, "mouseover", function(){
+            oInput.style.background = "#0d79d1";
+            oInput.style.cursor = "pointer";
+        });
+        addEvent(oInput, "mouseout", function(){
+            oInput.style.background = "#0f88eb";
+        });
+        /*聚焦框*/
+        var preMask = document.createElement("div");
+        preMask.style.cssText = "width: 160px;height: 160px;background: transparent;position: absolute;" +
+                "left: 50%;top: 50%;";
+        preMask.style.zIndex = 2;
+
+
+        /*进行模块的拼接*/
+        document.body.appendChild(mask);
+        document.body.appendChild(setAvatar);
+        avatarContainer.appendChild(preMask);
+        setAvatar.appendChild(h3);
+        setAvatar.appendChild(avatarContainer);
+        setAvatar.appendChild(closeAll);
+        setAvatar.appendChild(oInput);
+        preview(target,preMask);
     }
 </script>
 </body>
