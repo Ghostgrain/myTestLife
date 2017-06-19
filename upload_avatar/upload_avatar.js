@@ -1,10 +1,23 @@
 define(function(require, exports, module){
-    var avatarSize = {x: 0,y: 0};//存放切割后的位图
-
-    function UploadAvatar(target, options){
+    var avatarSize = {
+        sx:0,
+        sy:0,
+        width:160,
+        height:160,
+        x:0,
+        y:0,
+        imgWidth:320,
+        imgHeight:160
+    }//存放切割后的位矢
+    var options = {
+        url :"",
+    }
+    /*UploadAvatar类*/
+    function UploadAvatar(){
 
     }
-    UploadAvatar.prototype.mkAvatar = fileChange;
+    UploadAvatar.prototype.mkAvatar = fileChange();
+    UploadAvatar.prototype.addEvent = addEvent;
     /*图片预览函数*/
     function preview(file, preMask)
     {
@@ -12,7 +25,6 @@ define(function(require, exports, module){
         if (file.files && file.files[0])
         {
             var reader = new FileReader();
-
             reader.onload = function(evt){
                 var oImg = new Image();
                 oImg.src = evt.target.result;
@@ -39,7 +51,9 @@ define(function(require, exports, module){
 //                console.log(oImg.offsetWidth);
 //                prevDiv.innerHTML = '<img src="' + evt.target.result + '" style="width:256px"/>';
                 prevDiv.appendChild(oImg);
-            }
+
+                console.log(1111);
+            };
             reader.readAsDataURL(file.files[0]);
         }
         else
@@ -49,8 +63,9 @@ define(function(require, exports, module){
         }
     }
     /*文件大小检测*/
-    function fileChange(target){
+    function fileChange(target ,url){
         /*检测上传文件的类型*/
+        options.url = url;
         var btn = document.getElementById('submit_upload');
         var imgName = document.getElementById('avatar').value;
         var ext,idx;
@@ -96,7 +111,6 @@ define(function(require, exports, module){
         }else{
             /*所有验证都通过了,开始弹层*/
             doMask(target);
-            btn.disabled=false;
         }
     }
     function addEvent(ele, event, callback)//监听事件
@@ -138,11 +152,13 @@ define(function(require, exports, module){
                 }
                 avatar.style.left = avatar.left +"px";
                 avatar.style.top = avatar.top + "px";
-                avatarSize.x = 48-avatar.offsetLeft;
-                avatarSize.y = 48-avatar.offsetTop;
-                console.log(avatarSize);
+                //
+                //avatarSize.sx = 48 - avatar.offsetLeft ;
+                //avatarSize.sy = 48 - avatar.offsetTop ;
+                //clipImg(avatar, avatarSize);
                 return false;
             };
+            //clipImg(avatar, avatarSize);
             /*解决按键抬起无法释放的BUG*/
             window.onmouseup = function(){
                 document.onmousemove = null;//取消事件
@@ -188,6 +204,12 @@ define(function(require, exports, module){
         addEvent(oInput, "mouseout", function(){
             oInput.style.background = "#0f88eb";
         });
+        addEvent(oInput, "click", function(){
+            var img = $("UserAvatarEditor-container").childNodes[1];
+            avatarSize.sx = 48 - img.offsetLeft;
+            avatarSize.sy = 48 - img.offsetTop;
+            clipImg(options.url, img, avatarSize);
+        })
         /*聚焦框*/
         var preMask = document.createElement("div");
         preMask.style.cssText = "width: 160px;height: 160px;background: transparent;position: absolute;" +
@@ -207,15 +229,12 @@ define(function(require, exports, module){
             var oImg = slider.parentNode.childNodes[1].childNodes[1];
             if(oImg.style.width){
                 oImg.style.width = slider.value * 160 + "px";
-
             }else{
                 oImg.style.height = slider.value * 160 + "px";
             }
             oImg.style.marginTop = -oImg.offsetHeight/2 + "px";
             oImg.style.marginLeft = -oImg.offsetWidth/2 + "px";
-            avatarSize.x = 48-oImg.offsetLeft;
-            avatarSize.y = 48-oImg.offsetTop;
-            console.log(avatarSize);
+
         });
 
         /*进行模块的拼接*/
@@ -229,5 +248,70 @@ define(function(require, exports, module){
         setAvatar.appendChild(slider);
         preview(target,preMask);
     }
+    function clipImg(img, options, url){
+        /*Canvas切割部分*/
+        var realSize = realImgSize(img);
+        var scaleWidth = realSize.width / img.width;
+        var scaleHeight = realSize.height / img.height;
+
+        var clipImgCanvas = document.createElement("canvas");
+        clipImgCanvas.style.width = 160 + "px";
+        clipImgCanvas.style.height = 160 + "px";
+        var ctx = clipImgCanvas.getContext("2d");
+        ctx.drawImage(img, options.sx * scaleWidth, options.sy * scaleHeight, options.width * scaleWidth, options.height * scaleHeight,
+        options.x, options.y, options.imgWidth, options.imgHeight);
+        var fullQuality = clipImgCanvas.toDataURL("image/jpeg", 1.0);
+        var avatar = getByTag(getById('avatarContainer').childNodes, "img");
+        avatar[0].src = fullQuality;
+        avatar[0].style.width = 160 + "px";
+        avatar[0].style.height = 160 + "px";
+        ajaxPost(url ,fullQuality);
+        //img.style.zIndex = 999;
+        //document.body.appendChild(clipImgCanvas);
+        //return fullQuality;
+    }
+    function realImgSize(img){
+        var real_width,
+            real_height,
+            im          = document.createElement('img');
+            im.src      = img.src,
+            real_width  = im.width,
+            real_height = im.height;
+        return {width: real_width,height: real_height};
+    }
+    function ajaxPost(url, dataFile, callback)//ajax原生兼容
+    {   var fd = new FormData();
+        fd.append("upfile", dataFile);
+        var xele = null;
+        if(window.XMLHttpRequest)
+        {xele = new window.XMLHttpRequest();}
+        else if(window.ActiveXObject)
+        {
+            xele = new window.ActiveXObject("Msxml2.XMLHTTP");
+        }
+        xele.onreadystatechange = function()
+        {
+            if(xele.readyState == 4&& xele.status ==200)
+            {
+                callback (JSON.parse(xele.responseText));
+            }
+            xele.open('post', url, true);
+            xele.send(fd);
+        }
+    }
+    function getById(id){
+        return document.getElementById(id);
+    }
+    function getByTag(parent, tagName){
+        var arr = [];
+        tagName = tagName.toUpperCase();
+        for(var index in parent){
+            if(parent[index].tagName === tagName){
+                arr.push(parent[index]);
+            }
+        }
+        return arr;
+    }
+
     module.exports=UploadAvatar;
 });

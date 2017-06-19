@@ -6,11 +6,11 @@
 
 </head>
 <body>
-<form action="#" method="post">
-    <!--<div id="preview"></div>-->
-    <input type="file" onchange="T(this);" name="up_file" id="avatar"/>
-    <input id="submit_upload" type="submit" class="load-btn" value="上传" disabled />
-</form>
+    <div id="avatarContainer">
+        <img src="avatar.png" alt="头像" style="width: 160px" id="avatar-mask"/>
+        <input type="file" onchange="T(this);" name="up_file" id="avatar" style="display: none" accept="image/png,image/jpeg"/>
+    </div>
+
 <script src="require.js" data-main="app.js"></script>
 </body>
 </html>
